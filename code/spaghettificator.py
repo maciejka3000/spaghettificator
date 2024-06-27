@@ -4,6 +4,10 @@ import glob
 from ultralytics import YOLO
 from dataclasses import dataclass
 import moonrakerpy as mpy
+import cv2 as cv
+from io import BytesIO
+from urllib import request
+import numpy as np
 
 @dataclass
 class Spaghettificator:
@@ -24,7 +28,7 @@ class Spaghettificator:
     
     # init function
     def __init__(self):
-        self.__path_code = os.getcwd()
+        self.__path_code = os.path.dirname(__file__)
         self.__path_main = os.path.dirname(self.__path_code)
         self.__path_sets = os.path.join(self.__path_main, "settings.yaml")
         
@@ -42,7 +46,7 @@ class Spaghettificator:
         self.__loadsettings(yamldata)
         
         # Connecting to API
-        __printer = mpy.MoonrakerPrinter(self.__yaml_3d_url)
+        self.__printer = mpy.MoonrakerPrinter(self.__yaml_3d_url)
         
     # PRIVATE METHODS
         
@@ -63,7 +67,33 @@ class Spaghettificator:
         self.__yaml_ph_url = ''.join([self.__yaml_3d_url, yamldata['photos_url']])
         
     # PUBLIC METHODS
+    def get_printing_status(self) -> bool:
+        status = self.__printer.get_gcode(1)
+        statusmap = status[0][0:2]
+        if statusmap == "//" or statusmap == "!!":
+            return False
+        else:
+            return True
     
+    def get_image(self):
+        response = request.urlopen(self.__yaml_ph_url)
+        arr = np.asarray(bytearray(response.read()), dtype=np.uint8)
+        img = cv.imdecode(arr, -1)
+        return img
+    
+    def get_classification(self, img: np.ndarray = None):
+        
+        if not img:
+            img = self.get_image()
+            
+        data = self.__model.predict(img)
+        return data
+        
+        
+
+
+        
+        
     
         
         
@@ -71,3 +101,7 @@ class Spaghettificator:
         
         
 x = Spaghettificator()
+img = x.get_image()
+
+x.get_classification()
+
