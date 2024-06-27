@@ -1,0 +1,28 @@
+# This file contains settings used to configure spaghettificator. 
+
+# printer_url: IP of printer. If spaghettificator is running locally, this variable should remain empty.
+printer_url: 
+
+# photos_url: URL of webcam's snapshot action. This URL is found in mainsail settings: settings->webcams->URL->edit->URL Snapshot
+photos_url:
+
+# classification_settings: those variables are used to manage the process of photo classification. Algorithm works in two modes: detecting and ensuring mode.
+# During detecting mode, spaghettificator is doing detections rarely. When spaghetti is detected, algorithm changes to work in ensuring mode.
+
+# cls_detecting_gap: 30 - time between classification of images, measured in seconds
+# cls_sensitivity: .8 - threshold between changing from detecting to ensuring mode
+
+# cls_ensuring_gap: 5 - time between classification of images during ensuring mode
+# cls_ensuring_ncomp: 10 - amount of photos taken during ensuring mode
+# cls_ensuring_sensitivity: .95 - if this threshold is met during ensuring mode, the gcode macro is launched
+# spaghetti_detected_gcode: name of gcode macro to run when spaghetti was ensured
+# 
+classification_settings:
+  cls_detecting_gap: 30
+  cls_sensitivity: .8
+  cls_ensuring_gap: 5
+  cls_ensuring_ncomp: 10
+  cls_ensuring_sensitivity: .95
+  spaghetti_detected_gcode: "GCODE_SDETECT"
+  
+  
