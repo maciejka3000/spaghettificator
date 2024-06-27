@@ -1,10 +1,13 @@
 # This file contains settings used to configure spaghettificator. 
 
 # printer_url: IP of printer. If spaghettificator is running locally, this variable should remain empty.
-printer_url: 
+printer_url: "192.168.1.66"
 
 # photos_url: URL of webcam's snapshot action. This URL is found in mainsail settings: settings->webcams->URL->edit->URL Snapshot
-photos_url:
+photos_url: "/webcam/?action=snapshot"
+
+# model_name: name of model used to classification.
+model_name: "model.pt"
 
 # classification_settings: those variables are used to manage the process of photo classification. Algorithm works in two modes: detecting and ensuring mode.
 # During detecting mode, spaghettificator is doing detections rarely. When spaghetti is detected, algorithm changes to work in ensuring mode.
@@ -24,5 +27,5 @@ classification_settings:
   cls_ensuring_ncomp: 10
   cls_ensuring_sensitivity: .95
   spaghetti_detected_gcode: "GCODE_SDETECT"
-  
+
   
