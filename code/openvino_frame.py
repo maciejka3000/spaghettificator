@@ -1,9 +1,12 @@
 import openvino as ov
 import cv2 as cv
 import numpy as np
+import ast
 from dataclasses import dataclass
 
 
+
+# Dataclass used to get classification results using openVIVO toolkit. 
 @dataclass
 class Env_Vivo:
 
@@ -11,41 +14,53 @@ class Env_Vivo:
     __compiled_model: ov.CompiledModel
     __dtype: np.dtypes
     __classes: tuple
-    # public vars
+    __size_img: tuple
     
+    # private methods
     def __init__(self, model_path: str, classes:tuple = ("spaghetti", "nospaghetti"))-> None:
+        # Load and compile model
         model = ov.convert_model(model_path)
         self.__compiled_model = ov.compile_model(model)
+        
+        # Get proper type of input images
         self.__dtype = self.__compiled_model.inputs[0].element_type.to_dtype()
+        
+        # Find size of input images
+        shapesize = ast.literal_eval(self.__compiled_model.inputs[0].shape.to_string())
+        self.__size_img = tuple(shapesize[2: 4])
+        
+        # Write classification types to class
         self.__classes = classes
         
+    # Preprocess image to get a photo which is properly formatted to be classified by model
     def __imPreprocess(self, im_path) -> np.ndarray:
         img = cv.imread(im_path)
-        img = cv.resize(img, (256, 256))
+        img = cv.resize(img, self.__size_img)
         img = img / 255.0
         img = img.astype(self.__dtype)
         img = np.expand_dims(img, axis=0)
         return np.transpose(img, (0, 3, 1, 2))
     
-    def Classify(self, im_path: str):
+    ## PUBLIC METHODS
+    """
+    def Classify: Classify image using openVIVO toolkit.
+    INPUT:
+    im_path: str - path to classified image.
+    OUTPUT:
+    di: dict. Keys of this dict are the classification classes.
+    The values of keys are the confidence score of possible classes. 
+    """
+    def Classify(self, im_path: str) -> dict:
+        # Preprocess an image
         img = self.__imPreprocess(im_path)
+        
+        # Classify image, then get scores
         result = self.__compiled_model(img)
         scores = result[0][0].tolist()
+        
+        # zip classes and scores together, return it as dict
         di = dict(zip(self.__classes, scores))
         
         return di
-
-        
-
-
-
-
-path = "/home/maciejka/Documents/projects/spaghettificator/spaghettificator/model/model_raw.onnx"
-
-path_img = "/home/maciejka/Documents/projects/spaghettificator/training-models/3.jpg"
-
-env = Env_Vivo(path)
-scr = env.Classify(path_img)
-print(scr)
 
 
