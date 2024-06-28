@@ -1,7 +1,6 @@
 import yaml
 import os
 import glob
-from ultralytics import YOLO
 from dataclasses import dataclass
 import moonrakerpy as mpy
 import cv2 as cv
@@ -19,9 +18,9 @@ class Spaghettificator:
     __yaml_3d_url: str
     __yaml_ph_url: str
     
-    __model_settings: dict
-    __model: YOLO
+    __yaml_execution_enviroment: str
     
+    __model_settings: dict
     __printer: mpy
     
     # public vars
@@ -40,25 +39,28 @@ class Spaghettificator:
         
         #1. get urls
         self.__loadurls(yamldata)
-        #2. get model
-        self.__loadmodel(yamldata)
+        #2. load execution enviroment
+        self.__load_env(yamldata)
         #3. get classification settings
         self.__loadsettings(yamldata)
+        
         
         # Connecting to API
         self.__printer = mpy.MoonrakerPrinter(self.__yaml_3d_url)
         
     # PRIVATE METHODS
-        
-    def __loadsettings(self, yamldata: dict):
-        self.__model_settings = yamldata['classification_settings']
     
-    def __loadmodel(self, yamldata: dict):
-        model_name = yamldata['model_name']
-        model_path = os.path.join(self.__path_main, "model", model_name)
-        self.__model = YOLO(model_path)
+    def __load_env(self, yamldata: dict) -> None:
+        self.__yaml_execution_enviroment = yamldata['execution_enviroment']
         
-    def __loadurls(self, yamldata: dict):
+        
+        
+    def __loadsettings(self, yamldata: dict) -> None:
+        self.__model_settings = yamldata['classification_settings']
+        
+
+        
+    def __loadurls(self, yamldata: dict) -> None:
         if not yamldata['printer_url']:
             self.__yaml_3d_url = "localhost"
         else:
@@ -75,19 +77,12 @@ class Spaghettificator:
         else:
             return True
     
-    def get_image(self):
+    def get_image(self) -> np.ndarray:
         response = request.urlopen(self.__yaml_ph_url)
         arr = np.asarray(bytearray(response.read()), dtype=np.uint8)
         img = cv.imdecode(arr, -1)
         return img
     
-    def get_classification(self, img: np.ndarray = None):
-        
-        if not img:
-            img = self.get_image()
-            
-        data = self.__model.predict(img)
-        return data
         
         
 
@@ -103,5 +98,5 @@ class Spaghettificator:
 x = Spaghettificator()
 img = x.get_image()
 
-x.get_classification()
+print(type(img))
 
