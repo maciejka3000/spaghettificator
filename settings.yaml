@@ -6,8 +6,14 @@ printer_url: "192.168.1.66"
 # photos_url: URL of webcam's snapshot action. This URL is found in mainsail settings: settings->webcams->URL->edit->URL Snapshot
 photos_url: "/webcam/?action=snapshot"
 
-# model_name: name of model used to classification.
-model_name: "model.pt"
+# model_name: "model.onnx" - name of model used to classification.
+model_name: "model.onnx"
+
+# execution_enviroment: "onnx", "openvivo" - framework used to classify image.
+# The execution enviroment can apply to the general performance of application.
+# The fastest execution enviroment should be chosen. In general, openVIVO is known to work faster, especially on Intel Core CPUs and Intel GPUs.
+# The openVIVO is not working on any hardware. Check the requirements in https://docs.openvino.ai/2024/about-openvino/release-notes-openvino/system-requirements.html
+execution_enviroment: "openvino"
 
 # classification_settings: those variables are used to manage the process of photo classification. Algorithm works in two modes: detecting and ensuring mode.
 # During detecting mode, spaghettificator is doing detections rarely. When spaghetti is detected, algorithm changes to work in ensuring mode.
@@ -19,7 +25,6 @@ model_name: "model.pt"
 # cls_ensuring_ncomp: 10 - amount of photos taken during ensuring mode
 # cls_ensuring_sensitivity: .95 - if this threshold is met during ensuring mode, the gcode macro is launched
 # spaghetti_detected_gcode: name of gcode macro to run when spaghetti was ensured
-# 
 classification_settings:
   cls_detecting_gap: 30
   cls_sensitivity: .8
