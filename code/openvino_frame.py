@@ -33,8 +33,7 @@ class Env_Vivo:
         self.__classes = classes
         
     # Preprocess image to get a photo which is properly formatted to be classified by model
-    def __imPreprocess(self, im_path) -> np.ndarray:
-        img = cv.imread(im_path)
+    def __imPreprocess(self, img) -> np.ndarray:
         img = cv.resize(img, self.__size_img)
         img = img / 255.0
         img = img.astype(self.__dtype)
@@ -43,16 +42,18 @@ class Env_Vivo:
     
     ## PUBLIC METHODS
     """
-    def Classify: Classify image using openVIVO toolkit.
-    INPUT:
-    im_path: str - path to classified image.
-    OUTPUT:
-    di: dict. Keys of this dict are the classification classes.
-    The values of keys are the confidence score of possible classes. 
+    Classify: Classify image using openVIVO toolkit.
+    
+    Parameters:
+        im_path (str): path to classified image.
+        
+    Returns:
+        di (dict):  Keys of this dict are the classification classes.
+                    The values of keys are the confidence score of possible classes. 
     """
-    def Classify(self, im_path: str) -> dict:
+    def Classify(self, img: np.ndarray) -> dict:
         # Preprocess an image
-        img = self.__imPreprocess(im_path)
+        img = self.__imPreprocess(img)
         
         # Classify image, then get scores
         result = self.__compiled_model(img)
@@ -62,5 +63,3 @@ class Env_Vivo:
         di = dict(zip(self.__classes, scores))
         
         return di
-
-
